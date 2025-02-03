@@ -1,3 +1,5 @@
+// Credentials required for Spotify web App 
+// ClientID and ClientSecret - specific for this App
 const Credentials = () => {
 
     return {
