@@ -1,12 +1,11 @@
 
 require('dotenv').config();
 var express = require('express');
-var querystring = require('querystring');
 const SpotifyWebApi = require('spotify-web-api-node');
-
-var tokenEndPoint = 'https://accounts.spotify.com/api/token';
 const app = express();
-app.use(express.static('public')); 
+
+const cors = require('cors');
+app.use(cors());
 
 const spotifyApi = new SpotifyWebApi({
     clientId: '4bd6a01fade9432faf647609c95a3368', // process.env.CLIENT_ID,
@@ -16,13 +15,16 @@ const spotifyApi = new SpotifyWebApi({
 
 // authorization request
 app.get('/login', function (req, res) {
+    console.log("starting login");
     var scope = ['user-read-private', 'user-read-email'];
-    res.redirect(spotifyApi.createAuthorizeURL(scope));
+    res.json(spotifyApi.createAuthorizeURL(scope));
+    console.log(spotifyApi.createAuthorizeURL(scope));
 });
 
 // request refresh and access tokens
 // after checking the state parameter
 app.get('/callback', function (req, res) {
+    console.log("starting callback")
     var code = req.query.code || null;
     var state = req.query.state || null;
     var error = req.query.error;
@@ -55,8 +57,6 @@ app.get('/callback', function (req, res) {
     });
 });
 
-app.get('/me')
-
-app.listen(process.env.PORT || 3000, () => {
+app.listen(process.env.PORT || 5000, () => {
     console.log('server is running');
 });
