@@ -23,13 +23,10 @@ app.get('/login', function (req, res) {
 // request refresh and access tokens
 // after checking the state parameter
 app.get('/callback', function (req, res) {
-    console.log("starting callback")
-    console.log(req);
-    console.log(res);
+    console.log("starting callback");
     var code = req.query.code || null;
     var state = req.query.state || null;
     var error = req.query.error;
-    console.log(code);
 
     if (error) {
         console.error('Error Callback:', error);
@@ -39,27 +36,29 @@ app.get('/callback', function (req, res) {
 
     spotifyApi.authorizationCodeGrant(code)
         .then(data => {
-        console.log('tokening');
-        console.log(data);
-        const accessToken = data.body['access_token'];
-        const refreshToken = data.body['refresh_token'];
-        const expire = data.body['expries_in'];
+            console.log('INITIALISING TOKENS');
+            const accessToken = data.body['access_token'];
+            const refreshToken = data.body['refresh_token'];
+            const expire = data.body['expries_in'];
 
-        spotifyApi.setAccessToken(accessToken);
-        spotifyApi.setRefreshToken(refreshToken);
+            spotifyApi.setAccessToken(accessToken);
+            spotifyApi.setRefreshToken(refreshToken);
 
-        console.log(accessToken, refreshToken);
-        res.send('Success!');
+            console.log('ATTEMPTING REDIRECT');
+            res.redirect('http://localhost:3000');
 
-        setInterval(async () => {
-            const data = await spotifyApi.refreshAccessToken();
-            const accessTokenRefreshed = data.body['access_token'];
-            spotifyApi.setAccessToken(accessTokenRefreshed);
-        }, expire / 2 * 1000);
-    }).catch(error => {
+            /*
+            setInterval(async () => {
+                console.log('SET INTERVAL');
+                const data = await spotifyApi.refreshAccessToken();
+                const accessTokenRefreshed = data.body['access_token'];
+                spotifyApi.setAccessToken(accessTokenRefreshed);
+            }, expire / 2 * 1000);*/
+        }).catch( error => {
         console.error('Error Token:', error);
         res.send('Error getting token');
-    });
+        return;
+        });
 });
 
 app.get('/userData', function (req, res) {

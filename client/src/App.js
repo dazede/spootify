@@ -16,8 +16,8 @@ function App() {
             }*/
             const data = await response.data;
             window.location.replace(data);
-            const tryCallback = await axios.get('/callback');
-            console.log(tryCallback);
+            //const tryCallback = await axios.get('/callback');
+            //console.log(tryCallback);
             setLoading(false);
 
         } catch (error) {
