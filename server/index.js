@@ -1,16 +1,16 @@
 
 require('dotenv').config();
-var express = require('express');
+const express = require('express');
+const cors = require('cors');
 const SpotifyWebApi = require('spotify-web-api-node');
 const app = express();
-
-const cors = require('cors');
-app.use(cors());
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.options('*', cors());
 
 const spotifyApi = new SpotifyWebApi({
     clientId: '4bd6a01fade9432faf647609c95a3368', // process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
-    redirectUri: 'http://localhost:3000/callback'//process.env.REDIRECTURL
+    redirectUri: 'http://localhost:5000/callback'//process.env.REDIRECTURL
 });
 
 // authorization request
@@ -18,16 +18,18 @@ app.get('/login', function (req, res) {
     console.log("starting login");
     var scope = ['user-read-private', 'user-read-email'];
     res.json(spotifyApi.createAuthorizeURL(scope));
-    console.log(spotifyApi.createAuthorizeURL(scope));
 });
 
 // request refresh and access tokens
 // after checking the state parameter
 app.get('/callback', function (req, res) {
     console.log("starting callback")
+    console.log(req);
+    console.log(res);
     var code = req.query.code || null;
     var state = req.query.state || null;
     var error = req.query.error;
+    console.log(code);
 
     if (error) {
         console.error('Error Callback:', error);
@@ -35,7 +37,10 @@ app.get('/callback', function (req, res) {
         return;
     }
 
-    spotifyApi.authorizationCodeGrant(code).then(data => {
+    spotifyApi.authorizationCodeGrant(code)
+        .then(data => {
+        console.log('tokening');
+        console.log(data);
         const accessToken = data.body['access_token'];
         const refreshToken = data.body['refresh_token'];
         const expire = data.body['expries_in'];
@@ -55,6 +60,18 @@ app.get('/callback', function (req, res) {
         console.error('Error Token:', error);
         res.send('Error getting token');
     });
+});
+
+app.get('/userData', function (req, res) {
+    console.log('GETTING USER DATA')
+    spotifyApi.getMe()
+        .then(function (data) {
+            console.log('User', data.body);
+            res.send(data.body);
+        }).catch(error => {
+            console.log('Error User Data:', error);
+            res.send('Error Getting User Data');
+        });
 });
 
 app.listen(process.env.PORT || 5000, () => {
