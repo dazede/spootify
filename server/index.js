@@ -16,7 +16,7 @@ const spotifyApi = new SpotifyWebApi({
 // authorization request
 app.get('/login', function (req, res) {
 	console.log("starting login");
-	var scope = ['user-read-private', 'user-read-email'];
+	var scope = ['user-read-private', 'user-read-email', 'user-top-read'];
 	res.json(spotifyApi.createAuthorizeURL(scope));
 });
 
@@ -64,11 +64,30 @@ app.get('/userData', function (req, res) {
 	console.log('GETTING USER DATA')
 	spotifyApi.getMe()
 		.then(function (data) {
-			console.log('User', data.body);
 			res.json(data.body.display_name);
 		}).catch(error => {
 			console.log('Error User Data:', error);
 			res.send('Error Getting User Data');
+		});
+});
+
+app.get('/userTopData', function (req, res) {
+	console.log('GETTING USER TOP DATA')
+	spotifyApi.getMyTopArtists({ time_range: "short_term"})
+		.then(function (data) {
+			var genres = [];
+			var artists = data.body.items;
+			
+			for (const artist of artists) { 
+				if (artist.genres !== undefined) {
+					artist.genres.forEach(e => genres.push(e));
+				}
+			};
+			console.log(genres);
+			res.json(data.body);
+		}).catch(error => {
+			console.log('Error User Top Data:', error);
+			res.send('Error Getting User Top Data');
 		});
 });
 
