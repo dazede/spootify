@@ -84,7 +84,7 @@ app.get('/userTopData', function (req, res) {
 				}
 			};
 			console.log(genres);
-			res.json(data.body);
+			res.json(genres);
 		}).catch(error => {
 			console.log('Error User Top Data:', error);
 			res.send('Error Getting User Top Data');
