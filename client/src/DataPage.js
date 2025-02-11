@@ -1,5 +1,7 @@
 import React from 'react';
 import axios from 'axios';
+import "./App.css";
+import { PieChart, Pie, Cell } from 'recharts';
 
 const DisplayData = () => {
     const [user, setUser] = React.useState("");
@@ -26,8 +28,15 @@ const DisplayData = () => {
             response.data.forEach((value) => {
             countDict[value] = (countDict[value] || 0) + 1;
             });
-        
-            setUserTop(countDict);
+     
+            const sortedData = Object.entries(countDict)
+                .sort(([, A], [, B]) => B - A)
+                .slice(0,6)
+                .map(([key, value]) => ({
+                    name: key.includes('alternative') ? key.replace('alternative', 'alt') : key,
+                    value: value
+                  }));
+            setUserTop(sortedData);
         } catch (error) {
             console.log(error);
         }
@@ -47,25 +56,56 @@ const DisplayData = () => {
         }
     }, [userTopDataRetrieved]);
 
+    const RADIAN = Math.PI / 180;
+    const renderCustomisedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
+    const radius = outerRadius + 30;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    return (
+        <text
+        x={x}
+        y={y}
+        fill={COLORS[index % COLORS.length]}
+        textAnchor={x > cx ? "start" : "end"}
+        dominantBaseline="central"
+      >
+        {userTop[index].name}
+      </text>
+    );
+    };
+
+    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#00CFFF', '#008042'];
+
     return (
         <div className="App">
             <header className="App-header">
                 <h1>Aurify</h1>
                 {userDataRetrieved && <p>{user}</p>}
-
+           
                 {userTopDataRetrieved && Object.keys(userTop).length > 0 && (
-                <section>
-                    <ul>
-                        {Object.entries(userTop)
-                        .sort(([, valueA], [, valueB]) => valueB - valueA)
-                        .slice(0, 6)
-                        .map(([key, value]) => (
-                            <li key={key}>{`${key}: ${value}`}</li>
-                        ))}
-                    </ul>
-                </section>
+                //<ResponsiveContainer width="100%" height="300px">
+                    <PieChart width={700} height={700}>
+                        <Pie
+                            data={userTop}
+                            //innerRadius={120}
+                            //outerRadius={180}
+                            //paddingAngle={5}
+                            outerRadius={180}
+                            dataKey="value"
+                            fill="green"
+                            label={renderCustomisedLabel}
+                            >
+                            {userTop.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                        </Pie>
+                    </PieChart>
+                //</ResponsiveContainer>
                 )}
+         
             </header>
+            
         </div>
       );
 };

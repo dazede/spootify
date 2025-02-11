@@ -39,7 +39,7 @@ function App() {
 					<div className="App">
 						<header className="App-header">
 							<h1>Aurify</h1>
-							<button onClick={LaunchLogin} disabled={loading}>
+							<button className="login-button" onClick={LaunchLogin} disabled={loading}>
 								{loading ? "Redirecting..." : "login"}
 							</button>
 						</header>
