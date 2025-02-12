@@ -6,22 +6,18 @@ import { PieChart, Pie, Cell } from 'recharts';
 const DisplayData = () => {
     const [user, setUser] = React.useState("");
     const [userTop, setUserTop] = React.useState("");
-    const [userDataRetrieved, setUserDataRetrieved] = React.useState(false);
-    const [userTopDataRetrieved, setUserTopDataRetrieved] = React.useState(false);
     
     const GetUserData = async () => {
-        console.log('Trying to get User Data');
         try {
             const response = await axios.get('/userData')
-            console.log(response.data);
             setUser(response.data);
+            console.log('User Data Success');
         } catch (error) {
             console.log(error);
         }
     };
 
     const GetUserTopData = async () => {
-        console.log('Trying to get User Top Data');
         try {
             const response = await axios.get('/userTopData');
             const countDict = {};  
@@ -37,6 +33,7 @@ const DisplayData = () => {
                     value: value
                   }));
             setUserTop(sortedData);
+            console.log('User Top Data Success');
         } catch (error) {
             console.log(error);
         }
@@ -44,17 +41,8 @@ const DisplayData = () => {
 
     React.useEffect(() => {
         GetUserData();
-        if (!userDataRetrieved) {
-            setUserDataRetrieved(true);
-        }
-    }, [userDataRetrieved]);
-
-    React.useEffect(() => {
         GetUserTopData();
-        if (!userTopDataRetrieved) {
-            setUserTopDataRetrieved(true);
-        }
-    }, [userTopDataRetrieved]);
+    }, []);
 
     const RADIAN = Math.PI / 180;
     const renderCustomisedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
@@ -63,7 +51,8 @@ const DisplayData = () => {
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
     return (
-        <text
+        <text 
+        className="pie-text"
         x={x}
         y={y}
         fill={COLORS[index % COLORS.length]}
@@ -81,9 +70,9 @@ const DisplayData = () => {
         <div className="App">
             <header className="App-header">
                 <h1>Aurify</h1>
-                {userDataRetrieved && <p>{user}</p>}
+                {user && <p>{user}</p>}
            
-                {userTopDataRetrieved && Object.keys(userTop).length > 0 && (
+                {userTop && Object.keys(userTop).length > 0 && (
                 //<ResponsiveContainer width="100%" height="300px">
                     <PieChart width={700} height={700}>
                         <Pie
@@ -95,9 +84,16 @@ const DisplayData = () => {
                             dataKey="value"
                             fill="green"
                             label={renderCustomisedLabel}
+                            cornerRadius={5}
                             >
                             {userTop.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                <Cell key={`cell-${index}`} 
+                                fill={COLORS[index % COLORS.length]} 
+                                //stroke="none"
+                                strokeWidth={1.5} 
+                               // strokeOpacity={0.4}
+                                
+                             />
                             ))}
                         </Pie>
                     </PieChart>

@@ -8,6 +8,8 @@ function App() {
 	//const [error, setError] = React.useState(null);
 	const [loading, setLoading] = React.useState(false);
 	const [hasRendered, setHasRendered] = React.useState(false);
+	const [transition, setTransitionEnd] = React.useState(false);
+	const [data, setData] = React.useState(null);
 
 	const LaunchLogin = async () => {
 		setLoading(true);
@@ -16,15 +18,25 @@ function App() {
 			/*if (!response.ok) {
 				throw new Error('Failed to login')
 			}*/
-			const data = await response.data;
-			window.location.replace(data);
+			const responseData = await response.data;
+			setData(responseData);
 			setLoading(false);
-
 		} catch (error) {
 			console.log(error);
 			setLoading(false);
 		}
 	};
+
+	const handleTransitionEnd = () => {
+		setTransitionEnd(true);
+	}
+
+	React.useEffect(() => {
+		// Redirect only when both conditions are met
+		if (data && transition) {
+			window.location.replace(data);
+		}
+	}, [data, transition]);
 
 	React.useEffect(() => {
 		if (!hasRendered) {
@@ -39,8 +51,14 @@ function App() {
 					<div className="App">
 						<header className="App-header">
 							<h1>Aurify</h1>
-							<button className="login-button" onClick={LaunchLogin} disabled={loading}>
-								{loading ? "Redirecting..." : "login"}
+							<button 
+							className={`button ${transition ? "clicked" : ""}`} 
+							onClick={LaunchLogin} 
+							onTransitionEnd={handleTransitionEnd}
+							disabled={loading}>
+								<span>
+								{"login"}
+								</span>
 							</button>
 						</header>
 					</div>}> 
