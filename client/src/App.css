@@ -1,9 +1,14 @@
 .App {
   text-align: center;
   overflow: hidden;
-  max-width: 100vw;
-  max-height: 100vh;
+  min-width: 100vw;
+  min-height: 100vh;
   color: #181818;
+  background-color: #F5F5F5;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 * {
@@ -11,6 +16,18 @@
   padding: 0;
   box-sizing: border-box;
   font-family: "Coiny", serif;
+}
+
+:root{
+  --pie-radius: 120;
+}
+
+.App-header {  
+  min-height: 20vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(2em + 2vmin);
 }
 
 .bagel-fat-one-regular {
@@ -52,24 +69,20 @@
 }
 
 .pie-text {
-  font-size: 0.5em;
+  font-size: 1em;
+}
+
+.pie {
+  margin-top: 4em;
+  padding-top: 0;
+  width: 100vw; 
+  height: 300px
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
   }
-}
-
-.App-header {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(2em + 2vmin);
-  background-color: #F5F5F5;
-  color: #181818;
 }
 
 .App-link {
@@ -83,4 +96,11 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+@media only screen and (max-width: 400px) {
+  .pie-text {
+    font-size: 0.8em;
+  }
+  :root {--pie-radius: 90;}
 }
